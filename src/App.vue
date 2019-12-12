@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <h1>{{this.$store.state.lintasan[0].content}}</h1>
-    <!-- <h1>ahusdhkaushdka</h1> -->
+  <div id="app">   
     <router-view/>
   </div>
 </template>
@@ -9,6 +7,8 @@
 <script>
   import {mapState} from '../src/store/index'
   export default {
+    name : 'home-page',
+
     data(){
       return {
         player : [],
@@ -26,6 +26,4 @@
 
 <style>
 
-
 </style>
-

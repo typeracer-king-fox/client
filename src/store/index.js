@@ -23,14 +23,27 @@ require("firebase/firestore")
 
 export default new Vuex.Store({
   state: {
-    lintasan : []
+    lintasan : [],
+    rooms : []
   },
   mutations: {
     GET_DATA(state,payload){
       state.lintasan = payload
+    },
+    GET_ROOMS(state,payload){
+      state.rooms = payload
     }
   },
   actions: {
+    createRoom({dispatch},payload){
+      return db.collection('rooms').doc(payload.roomName).set(payload)
+                .then(success => {
+                    dispatch('getRooms')
+                })
+                .catch(err => {
+                  console.log(err)
+                })
+    },
     getData({commit}){
       let lintasan = []
       db.collection('lintasan').onSnapshot(querySnapshot => {
@@ -39,6 +52,16 @@ export default new Vuex.Store({
           })
       })
       commit('GET_DATA',lintasan)
+    },
+    getRooms({commit}){
+      let rooms = []
+      db.collection('rooms').onSnapshot(querySnapshot => {
+        querySnapshot.forEach(room => {
+          rooms.push(room.data())
+          })
+      })
+      console.log(rooms.length,'from get Roomss')
+      commit('GET_ROOMS',rooms)
     }
   },
   modules: {
