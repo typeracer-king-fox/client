@@ -1,14 +1,22 @@
 <template>
   <div class="board">
-      <div class="main-content" >
+      <div v-if="welcomePage === true" class="opening">
+          <form style="padding:50px;">
+                <div class="form-group">
+                    <label for="exampleFormControlInput1">Player Name</label>
+                    <input v-model="name" type="text" class="form-control" id="exampleFormControlInput1" placeholder="player name">
+                    <button type="button" @click="joinPlayer" class="btn btn-primary" data-dismiss="modal">Play</button>
+                </div>
+            </form>
+      </div>
+      <div v-if="welcomePage === false" class="main-content" >
         <h3 style="margin-top:30px;">Welcome to</h3>
         <h1 style="margin-top:-10px;">KING of TYPING</h1>
         <hr style="width:10%;margin:10px">
-            <!-- <h1>{{this.$store.state.rooms}}</h1> -->
             <b-button style="margin:5px;width:200px;border-radius:20px;" data-toggle="modal" data-target="#exampleModalCenter" variant="warning">Create Rooms</b-button>
             <h6> or join rooms</h6>
         <div class="rooms">
-                <b-button v-for="(room,index) in this.$store.state.rooms" data-toggle="modal" data-target="#exampleModalCenter2" :key="index" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
+                <b-button v-for="(room,index) in this.$store.state.rooms" :key="index"  @click="joinRoom" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
         </div>
             <!-- Modal -->
             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -42,21 +50,6 @@
             </div>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                <form style="padding:50px;">
-                    <div class="form-group">
-                        <label for="exampleFormControlInput1">Player Name</label>
-                        <input v-model="playerName" type="text" class="form-control" id="exampleFormControlInput1" placeholder="king of typeracer">
-                    </div>
-                    <button type="button" @click="joinRoom" style="margin-right:10px" class="btn btn-primary" data-dismiss="modal">Join Room</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </form>
-
-                </div>
-            </div>
-            </div>
       </div>
       
   </div>
@@ -70,22 +63,39 @@ export default {
         return {
             name:'',
             numberOfPlayer :'',
-            playerName:''
+            playerName:'',
+            welcomePage:true
         }
     },
     methods: {
+        joinRoom(roomName){
+            console.log('saiufgisaf');
+            
+            console.log(roomName)
+        },
+        joinPlayer(){
+            localStorage.setItem('player',this.name)
+            this.welcomePage=false
+        },
         createRoom(){
             let payload = {
                 roomName : this.name,
-                numberOfPlayer : this.numberOfPlayer
+                numberOfPlayer : this.numberOfPlayer,
+                players : [],
+                inRace : false
             }
+            localStorage.setItem('rooms',this.name)
             this.$store.dispatch('createRoom',payload)
+            this.$router.push('/play')
         },
         joinRoom(){
             console.log(this.playerName)
         }
     },
     created(){
+        if(localStorage.getItem('player')){
+            this.welcomePage = false
+        }
         this.$store.dispatch('getRooms')
     },
     computed: {

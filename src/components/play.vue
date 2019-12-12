@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="sentence bg-info">
-      <q>{{this.$store.state.lintasan[1].content}}</q>
+      <q>{{randLintasan.content}}</q>
     </div>
     <h3>Type the sentence above</h3>
     <div class="input">
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'play',
   data: function () {
@@ -49,6 +51,12 @@ export default {
       progressP3: 90,
       progressP4: 25
     }
+  },
+  computed: {
+      ...mapState(['randLintasan'])
+  },
+  created () {
+      this.$store.commit('FILL_RAND_LINTASAN')
   }
 }
 </script>
