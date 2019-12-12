@@ -115,7 +115,7 @@ export default new Vuex.Store({
         if (this.state.rooms[index].id === payload.roomName) {
           roomIndex = index
 
-          if (this.state.rooms[index].players.length === 4) {
+          if (this.state.rooms[index].players.length === payload.numberOfPlayers) {
             roomIsFull = true
             break
           }
@@ -123,10 +123,10 @@ export default new Vuex.Store({
       }
 
       if (!roomIsFull) {
-        let nextPlayer = `player_${this.state.rooms[roomIndex].players.length + 1}`
+        this.state.rooms[roomIndex].players.push(payload.playerName)
         const roomRef = db.collection('rooms').doc(payload.roomName)
         roomRef.update({
-          [nextPlayer]: payload.playerName
+          players: this.state.rooms[roomIndex].players
         })
 
         this.getRooms()
