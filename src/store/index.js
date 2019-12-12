@@ -23,7 +23,8 @@ let db = firebase.firestore()
 export default new Vuex.Store({
   state: {
     lintasan: [],
-    rooms: []
+    rooms: [],
+    randLintasan: ''
   },
   mutations: {
     GET_DATA (state, payload) {
@@ -32,6 +33,11 @@ export default new Vuex.Store({
 
     FILL_ROOMS (state, payload) {
       state.rooms = payload.rooms
+    },
+
+    FILL_RAND_LINTASAN (state, payload) {
+      const index = Math.floor(Math.random() * state.lintasan.length)
+      state.randLintasan = state.lintasan[index]
     }
   },
   actions: {
@@ -43,6 +49,47 @@ export default new Vuex.Store({
         })
       })
       commit('GET_DATA', lintasan)
+    },
+
+    createRoom ({ commit }, payload) {
+      db.collection('rooms')
+        .add(payload)
+        .then(function (docRef) {
+          // console.log('Document written with ID: ', docRef.id)
+          // commit('FILL_RAND_LINTASAN')
+          this.getRooms()
+        })
+        .catch(function (error) {
+          console.error('Error adding document: ', error)
+        })
+    },
+
+    deleteRoom ({ commit }, { roomName }) {
+      db.collection('rooms')
+        .doc(roomName)
+        .delete()
+        .then(function () {
+          // console.log('Document successfully deleted!')
+          // commit('FILL_ROOMS')
+          this.getRooms()
+        })
+        .catch(function (error) {
+          console.error('Error removing document: ', error)
+        })
+    },
+
+    startRace ({ commit }, { roomName }) {
+      db.collection('rooms')
+        .doc(roomName)
+        .update({ inRace: true })
+        .then(function () {
+          // console.log('Document successfully updated!')
+          // commit('FILL_ROOMS')
+          this.getRooms()
+        })
+        .catch(function (error) {
+          console.error('Error updating document: ', error)
+        })
     },
 
     getRooms ({ commit }) {
