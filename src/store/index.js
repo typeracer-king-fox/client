@@ -108,15 +108,29 @@ export default new Vuex.Store({
     // 1. roomIndex to be joined
     // 2. guest's name
     joinRoom ({ commit }, payload) {
-      const roomRef = db.collection('rooms').doc(payload.roomName)
-      roomRef.update({
-        player_1: payload.player_1,
-        player_2: payload.player_2,
-        player_3: payload.player_3,
-        player_4: payload.player_4
-      })
+      let roomIsFull = false
+      let roomIndex = -1
 
-      this.getRooms()
+      for (let index in this.state.rooms) {
+        if (this.state.rooms[index].id === payload.roomName) {
+          roomIndex = index
+
+          if (this.state.rooms[index].players.length === 4) {
+            roomIsFull = true
+            break
+          }
+        }
+      }
+
+      if (!roomIsFull) {
+        let nextPlayer = `player_${this.state.rooms[roomIndex].players.length + 1}`
+        const roomRef = db.collection('rooms').doc(payload.roomName)
+        roomRef.update({
+          [nextPlayer]: payload.playerName
+        })
+
+        this.getRooms()
+      }
     }
   },
   modules: {
