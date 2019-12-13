@@ -109,7 +109,7 @@ export default {
                 'success'
             )
             
-            localStorage.setItem('rooms',this.name)
+            localStorage.setItem('room',this.name)
             this.$store.dispatch('createRoom',payload)
         },
     },

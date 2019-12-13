@@ -26,8 +26,7 @@ export default {
             roomDetail:{}
         }
     },
-    methods: {
-        
+    methods: {  
     },
     created(){
         if(localStorage.getItem('player')){
@@ -50,6 +49,19 @@ export default {
         
         
         
+    },
+    beforeRouteLeave (to, from, next) {
+      if (!to.params.id || to.params.id !== localStorage.getItem('room')) {
+        const payload = {
+          roomName: localStorage.getItem('room'),
+          playerName: localStorage.getItem('player')
+        }
+        this.$store.dispatch('deletePlayerFromRoom', payload)
+        localStorage.removeItem('room')
+        localStorage.removeItem('roomIndex')
+      }
+      // this.$router.push('/')
+      // console.log('ini to di before route leave rooms', to)
     }
 }
 </script>
