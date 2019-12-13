@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Play from '../components/play.vue'
+import Waiting from '../components/waitingRoom.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
     path: '/play',
     name: 'play',
     component: Play
+  },
+  {
+    path: '/waiting/:id',
+    name: 'waiting',
+    component: Waiting
   },
 ]
 
