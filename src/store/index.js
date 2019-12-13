@@ -30,7 +30,7 @@ export default new Vuex.Store({
     randLintasan: '',
     isFull : false,
     isWaiting : true,
-    roomNow : {}
+    roomNow : {} // players, progress, roomName
   },
   mutations: {
     GET_DATA (state, payload) {
@@ -46,6 +46,11 @@ export default new Vuex.Store({
     },
     DETAIL_ROOM(state,payload){
       state.roomNow = payload
+    },
+
+    UPDATE_ROOM_IN_RACE_TO_TRUE(state) {
+      state.roomNow.inRace = true
+      console.log(state.roomNow, 'STATUS ROOM NOW SETELAH KLIK PLAY')
     }
   },
   actions: {
@@ -154,15 +159,18 @@ export default new Vuex.Store({
               console.log('masuk kedalam room belum penuh')
               // console.log(this.state.rooms[index].players.length,Number(this.state.rooms[index].numberOfPlayers),'---------------')
               let playerNow = this.state.rooms[index].players
+              let progresses = this.state.rooms[index].progress
 
               if(playerNow.indexOf(payload.player) == -1) {
-                playerNow.push(payload.player);
+                playerNow.push(payload.player)
+                progresses.push(0)
               }
               router.push(`/waiting/${payload.roomName}`)
 
               const roomRef = db.collection('rooms').doc(payload.roomName)
               roomRef.update({
-                players: playerNow
+                players: playerNow,
+                progress: progresses
               })
 
               dispatch('getRooms')
@@ -173,6 +181,25 @@ export default new Vuex.Store({
       }
       
       
+    },
+
+    startGame ({ commit, dispatch }, roomName) {
+      console.log(roomName)
+      db.collection('rooms').doc(roomName).update({inRace: true})
+      .then(() => {
+          commit('UPDATE_ROOM_IN_RACE_TO_TRUE')
+      })
+    },
+
+    updateProgress({commit, dispatch}, payload) {
+      console.log(payload, 'INI DI ACTION UPDATE PROGRESS---------')
+      let playerIndex = this.state.roomNow.players.indexOf(localStorage.getItem('player'))
+      console.log('player index', playerIndex)
+      let currentProgress = this.state.roomNow.progress
+      currentProgress[playerIndex] = payload
+      db.collection('rooms').doc(localStorage.getItem('room')).update({ progress: currentProgress }).then(() => {
+        console.log('update progress sukses')
+      })
     }
   },
   modules: {

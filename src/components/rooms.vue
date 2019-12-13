@@ -103,6 +103,22 @@ export default {
                 progress : [0],
                 inRace : false
             }
+
+            // for(let i = 0; i < this.numberOfPlayer; i++) {
+            //     payload.progress.push(0)
+            // }
+
+            // isi state random lintasan dulu
+            // tambahin lintasan ke payload dari state randLintasan
+
+            // isi state random lintasan dulu
+            this.$store.commit('FILL_RAND_LINTASAN')
+
+            // tambahin lintasan ke payload dari state randLintasan
+            payload.lintasan = this.$store.state.randLintasan.content
+
+            console.log(payload, '-------------------- INI PAYLOAD PAS CREATE ROOM -----------------')
+
             Swal.fire(
                 'Room Created!',
                 'Lets wait for the challengers!',

@@ -23,11 +23,14 @@ export default {
     data() {
         return {
             waitingRoom:true,
-            roomDetail:{}
+            roomDetail:{},
         }
     },
     methods: {
-        
+        startGame() {
+            // this.$router.push({name: 'play'})
+            this.$store.dispatch('startGame', this.roomDetail.roomName)
+        }
     },
     created(){
         if(localStorage.getItem('player')){
@@ -46,10 +49,28 @@ export default {
         },
         getDetail(){
             
+        },
+
+        ...mapState(['roomNow'])
+
+        // startingRace() {
+        //     console.log('startingRace computed sdfasf -------------------------')
+        //     if(this.$store.state.roomNow.inRace) {
+        //         console.log('computed starting race triggered, starting the typerace')
+        //         return this.$router.push('/play')
+        //     }
+        // }
+
+        // ...mapState(['roomNow'])
+        // afunction() {
+        //     this.$router.push('/play')
+        // }
+    },
+    watch: {
+        roomNow: function(newVal, oldVal) {
+            
+            if(newVal.inRace === true) this.$router.push('/play')
         }
-        
-        
-        
     }
 }
 </script>
