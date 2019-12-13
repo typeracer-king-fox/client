@@ -54,7 +54,7 @@ export default new Vuex.Store({
                 .then(success => {
                     dispatch('getRooms')
                     console.log('created?? router jalan ga?')
-                    this.$router.push(`/waiting/${payload.roomName}`)
+                    router.push(`/waiting/${payload.roomName}`)
                 })
                 .catch(err => {
                   console.log(err)
@@ -82,6 +82,21 @@ export default new Vuex.Store({
         })
         .catch(function (error) {
           console.error('Error removing document: ', error)
+        })
+    },
+
+    deletePlayerFromRoom ({ dispatch }, { roomName, playerName }) {
+      // console.log('deleting player from room');
+      db.collection('rooms')
+        .doc(roomName)
+        .update({
+          players: firebase.firestore.FieldValue.arrayRemove(playerName)
+        })
+        .then(function () {
+          dispatch('getRooms')
+        })
+        .catch(function (error) {
+          console.error('Error deletePlayerFromRoom: ', error)
         })
     },
 
@@ -130,7 +145,6 @@ export default new Vuex.Store({
         // });
     },
 
-  
     joinRoom ({ dispatch }, payload) {
       let roomIsFull = false
       let roomIndex = -1

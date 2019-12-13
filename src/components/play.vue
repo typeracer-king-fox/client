@@ -4,25 +4,53 @@
       <div class="d-flex position-relative">
         <h5 class="d-flex mr-2 playerName">Player 1:</h5>
         <div class="progress d-flex">
-          <div class="progress-bar" :style="`width: ${this.progressP1}%`" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+          <div
+            class="progress-bar"
+            :style="`width: ${this.progressP1}%`"
+            role="progressbar"
+            aria-valuenow="50"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
         </div>
       </div>
       <div class="d-flex position-relative">
         <h5 class="d-flex mr-2 playerName">Player 2:</h5>
         <div class="progress d-flex">
-          <div class="progress-bar" :style="`width: ${this.progressP2}%`" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+          <div
+            class="progress-bar"
+            :style="`width: ${this.progressP2}%`"
+            role="progressbar"
+            aria-valuenow="75"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
         </div>
       </div>
       <div class="d-flex position-relative">
         <h5 class="d-flex mr-2 playerName">Player 3:</h5>
         <div class="progress d-flex">
-          <div class="progress-bar" :style="`width: ${this.progressP3}%`" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+          <div
+            class="progress-bar"
+            :style="`width: ${this.progressP3}%`"
+            role="progressbar"
+            aria-valuenow="75"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
         </div>
       </div>
       <div class="d-flex position-relative">
         <h5 class="d-flex mr-2 playerName">Player 4:</h5>
         <div class="progress d-flex">
-          <div class="progress-bar" :style="`width: ${this.progressP4}%`" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+          <div
+            class="progress-bar"
+            :style="`width: ${this.progressP4}%`"
+            role="progressbar"
+            aria-valuenow="75"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
         </div>
       </div>
     </div>
@@ -39,31 +67,44 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 
 export default {
-  name: 'play',
-  data: function () {
+  name: "play",
+  data: function() {
     return {
-      playerInput: '',
+      playerInput: "",
       progressP1: 50,
       progressP2: 75,
       progressP3: 90,
       progressP4: 25
-    }
+    };
   },
   computed: {
-      ...mapState(['randLintasan'])
+    ...mapState(["randLintasan"])
   },
-  created () {
-      this.$store.commit('FILL_RAND_LINTASAN')
+  created() {
+    this.$store.commit("FILL_RAND_LINTASAN");
+  },
+  beforeRouteLeave(to, from, next) {
+    if (!to.params.id || to.params.id !== localStorage.getItem("room")) {
+      const payload = {
+        roomName: localStorage.getItem("room"),
+        playerName: localStorage.getItem("player")
+      };
+      this.$store.dispatch("deletePlayerFromRoom", payload);
+      localStorage.removeItem("room");
+      localStorage.removeItem("roomIndex");
+    }
+    // this.$router.push('/')
+    // console.log('ini to di before route leave rooms', to)
   }
-}
+};
 </script>
 
 <style scoped>
 #playdiv {
-  background-image: url('../assets/background-images.jpg');
+  background-image: url("../assets/background-images.jpg");
   background-size: cover;
   height: 100vh;
   display: flex;
@@ -75,15 +116,15 @@ export default {
 .monitor {
   height: 20vh;
   padding: 1rem;
-  border-radius: 1rem
+  border-radius: 1rem;
 }
 .progress {
   width: 75vw;
-  border-radius: 1rem
+  border-radius: 1rem;
 }
 .playerName {
   position: relative;
-  top: -.5vh
+  top: -0.5vh;
 }
 .sentence {
   margin-bottom: 4vh;
@@ -91,14 +132,14 @@ export default {
   padding: 1rem;
   border-radius: 1rem;
   width: 35vw;
-  background-color: rgba(56, 208, 102, 0.5)
+  background-color: rgba(56, 208, 102, 0.5);
 }
-.input{
+.input {
   border: 3px solid orange;
   border-radius: 1rem;
   overflow: hidden;
 }
 textarea {
-  width: 25vw
+  width: 25vw;
 }
 </style>
