@@ -30,7 +30,7 @@ export default new Vuex.Store({
     randLintasan: '',
     isFull : false,
     isWaiting : true,
-    roomNow : {}
+    roomNow : {} // players, progress, roomName
   },
   mutations: {
     GET_DATA (state, payload) {
@@ -49,6 +49,11 @@ export default new Vuex.Store({
     },
     DETAIL_ROOM(state,payload){
       state.roomNow = payload
+    },
+
+    UPDATE_ROOM_IN_RACE_TO_TRUE(state) {
+      state.roomNow.inRace = true
+      console.log(state.roomNow, 'STATUS ROOM NOW SETELAH KLIK PLAY')
     }
   },
   actions: {
@@ -62,7 +67,7 @@ export default new Vuex.Store({
                 .then(success => {
                     dispatch('getRooms')
                     console.log('created?? router jalan ga?')
-                    this.$router.push(`/waiting/${payload.roomName}`)
+                    router.push(`/waiting/${payload.roomName}`)
                 })
                 .catch(err => {
                   console.log(err)
@@ -81,17 +86,30 @@ export default new Vuex.Store({
       commit('GET_DATA', lintasan)
     },
 
-    deleteRoom ({ commit }, { roomName }) {
+    deleteRoom ({ dispatch }, { roomName }) {
       db.collection('rooms')
         .doc(roomName)
         .delete()
         .then(function () {
-          // console.log('Document successfully deleted!')
-          // commit('FILL_ROOMS')
-          this.getRooms()
+          dispatch('getRooms')
         })
         .catch(function (error) {
           console.error('Error removing document: ', error)
+        })
+    },
+
+    deletePlayerFromRoom ({ dispatch }, { roomName, playerName }) {
+      // console.log('deleting player from room');
+      db.collection('rooms')
+        .doc(roomName)
+        .update({
+          players: firebase.firestore.FieldValue.arrayRemove(playerName)
+        })
+        .then(function () {
+          dispatch('getRooms')
+        })
+        .catch(function (error) {
+          console.error('Error deletePlayerFromRoom: ', error)
         })
     },
 
@@ -109,16 +127,22 @@ export default new Vuex.Store({
         })
     },
     
-    getRooms({commit,state}){
+    getRooms({ commit, dispatch }){
       // console.log(state.rooms,'---------------------------')
-      let rooms = []
       db.collection('rooms').onSnapshot(querySnapshot => {
+        let rooms = []
         querySnapshot.forEach(room => {
+          // console.log('ini masing2 room pas di getRooms', room.data())
+          if (room.data().players.length === 0) {
+            const payload = {
+              roomName: room.data().roomName
+            }
+            dispatch('deleteRoom', payload)
+          }
           rooms.push(room.data())
         })
+        commit('FILL_ROOMS', rooms)
       })
-      
-      commit('FILL_ROOMS', rooms)
     },
 
     getRoomDetail({commit},payload){
@@ -130,7 +154,6 @@ export default new Vuex.Store({
       })
     },
 
-  
     joinRoom ({ dispatch }, payload) {
       let roomIsFull = false
       let roomIndex = -1
@@ -171,6 +194,25 @@ export default new Vuex.Store({
       }
       
       
+    },
+
+    startGame ({ commit, dispatch }, roomName) {
+      console.log(roomName)
+      db.collection('rooms').doc(roomName).update({inRace: true})
+      .then(() => {
+          commit('UPDATE_ROOM_IN_RACE_TO_TRUE')
+      })
+    },
+
+    updateProgress({commit, dispatch}, payload) {
+      console.log(payload, 'INI DI ACTION UPDATE PROGRESS---------')
+      let playerIndex = this.state.roomNow.players.indexOf(localStorage.getItem('player'))
+      console.log('player index', playerIndex)
+      let currentProgress = this.state.roomNow.progress
+      currentProgress[playerIndex] = payload
+      db.collection('rooms').doc(localStorage.getItem('room')).update({ progress: currentProgress }).then(() => {
+        console.log('update progress sukses')
+      })
     }
   },
   modules: {

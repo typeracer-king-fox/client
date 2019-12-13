@@ -104,6 +104,11 @@ export default {
                 progress : [0],
                 inRace : false
             }
+            this.$store.commit('FILL_RAND_LINTASAN')
+            payload.lintasan = this.$store.state.randLintasan.content
+
+            console.log(payload, '-------------------- INI PAYLOAD PAS CREATE ROOM -----------------')
+
             Swal.fire(
                 'Room Created!',
                 'Lets wait for the challengers!',

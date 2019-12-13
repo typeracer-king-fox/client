@@ -23,7 +23,7 @@ export default {
     data() {
         return {
             waitingRoom:true,
-            roomDetail:{}
+            roomDetail:{},
         }
     },
     methods: {
@@ -46,7 +46,47 @@ export default {
             // return this.$store.dispatch('getRoomDetail',localStorage.getItem('room'))
             this.roomDetail = this.$store.state.roomNow
             return this.$store.state.roomNow
-        }, 
+        },
+        getDetail(){
+            
+        },
+
+        ...mapState(['roomNow'])
+
+        // startingRace() {
+        //     console.log('startingRace computed sdfasf -------------------------')
+        //     if(this.$store.state.roomNow.inRace) {
+        //         console.log('computed starting race triggered, starting the typerace')
+        //         return this.$router.push('/play')
+        //     }
+        // }
+
+        // ...mapState(['roomNow'])
+        // afunction() {
+        //     this.$router.push('/play')
+        // }
+    },
+    watch: {
+        roomNow: function(newVal, oldVal) {
+            
+            if(newVal.inRace === true) this.$router.push('/play')
+        }
+        
+        
+        
+    },
+    beforeRouteLeave (to, from, next) {
+      if (!to.params.id || to.params.id !== localStorage.getItem('room')) {
+        const payload = {
+          roomName: localStorage.getItem('room'),
+          playerName: localStorage.getItem('player')
+        }
+        this.$store.dispatch('deletePlayerFromRoom', payload)
+        localStorage.removeItem('room')
+        localStorage.removeItem('roomIndex')
+      }
+      // this.$router.push('/')
+      // console.log('ini to di before route leave rooms', to)
     }
 }
 </script>
