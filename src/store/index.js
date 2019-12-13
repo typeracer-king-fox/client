@@ -71,14 +71,12 @@ export default new Vuex.Store({
       commit('GET_DATA', lintasan)
     },
 
-    deleteRoom ({ commit }, { roomName }) {
+    deleteRoom ({ dispatch }, { roomName }) {
       db.collection('rooms')
         .doc(roomName)
         .delete()
         .then(function () {
-          // console.log('Document successfully deleted!')
-          // commit('FILL_ROOMS')
-          this.getRooms()
+          dispatch('getRooms')
         })
         .catch(function (error) {
           console.error('Error removing document: ', error)
@@ -114,16 +112,23 @@ export default new Vuex.Store({
         })
     },
     
-    getRooms({commit,state}){
+    getRooms({ commit, dispatch }){
       // console.log(state.rooms,'---------------------------')
-      let rooms = []
       db.collection('rooms').onSnapshot(querySnapshot => {
+        let rooms = []
         querySnapshot.forEach(room => {
+          console.log('ini masing2 room pas di getRooms', room.data())
+
+          if (room.data().players.length === 0) {
+            const payload = {
+              roomName: room.data().roomName
+            }
+            dispatch('deleteRoom', payload)
+          }
           rooms.push(room.data())
         })
+        commit('FILL_ROOMS', rooms)
       })
-      
-      commit('FILL_ROOMS', rooms)
     },
 
     getRoomDetail({commit},payload){
