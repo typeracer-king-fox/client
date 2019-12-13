@@ -107,24 +107,27 @@ export default new Vuex.Store({
           rooms.push(room.data())
         })
       })
-      console.log('trigered?',rooms)
+      
       commit('FILL_ROOMS', rooms)
     },
 
     getRoomDetail({commit},payload){
       
       // let rooms = []
-      db.collection('rooms').doc(payload).get()
-        .then(doc => {
-          if (!doc.exists) {
-          } else {
-            console.log('trigered ga yak?')
-            commit('DETAIL_ROOM',doc.data())
-          }
-        })
-        .catch(err => {
-          console.log('Error getting document', err);
-        });
+      db.collection('rooms').doc(payload).onSnapshot(querySnapshot => {
+        // console.log(querySnapshot.data(),'--------------------')
+        commit('DETAIL_ROOM',querySnapshot.data())
+      })
+        // .then(doc => {
+        //   if (!doc.exists) {
+        //   } else {
+        //     console.log('trigered ga yak?')
+        //     commit('DETAIL_ROOM',doc.data())
+        //   }
+        // })
+        // .catch(err => {
+        //   console.log('Error getting document', err);
+        // });
     },
 
   
@@ -163,7 +166,7 @@ export default new Vuex.Store({
               })
 
               dispatch('getRooms')
-              // dispatch('getRoomDetail')
+              dispatch('getRoomDetail')
             }
           }
         }
