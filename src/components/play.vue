@@ -6,7 +6,14 @@
       <!-- <div class="d-flex position-relative">
         <h5 class="d-flex mr-2 playerName">Player 1:</h5>
         <div class="progress d-flex">
-          <div class="progress-bar" :style="`width: ${this.progressP1}%`" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+          <div
+            class="progress-bar"
+            :style="`width: ${this.progressP1}%`"
+            role="progressbar"
+            aria-valuenow="50"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
         </div>
       </div> -->
       <!-- <p>{{roomDetail.players}}</p> -->
@@ -40,8 +47,8 @@ import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 
 export default {
-  name: 'play',
-  data: function () {
+  name: "play",
+  data: function() {
     return {
       lintasan: 'An initial call using the callback you provide',
       playerInput: '',
@@ -125,12 +132,12 @@ export default {
       this.$store.dispatch('updateProgress', this.benar)
     }, 382)
   }
-}
+};
 </script>
 
 <style scoped>
 #playdiv {
-  background-image: url('../assets/background-images.jpg');
+  background-image: url("../assets/background-images.jpg");
   background-size: cover;
   height: 100vh;
   display: flex;
@@ -142,15 +149,15 @@ export default {
 .monitor {
   height: 20vh;
   padding: 1rem;
-  border-radius: 1rem
+  border-radius: 1rem;
 }
 .progress {
   width: 75vw;
-  border-radius: 1rem
+  border-radius: 1rem;
 }
 .playerName {
   position: relative;
-  top: -.5vh
+  top: -0.5vh;
 }
 .sentence {
   margin-bottom: 4vh;
@@ -158,14 +165,14 @@ export default {
   padding: 1rem;
   border-radius: 1rem;
   width: 35vw;
-  background-color: rgba(56, 208, 102, 0.5)
+  background-color: rgba(56, 208, 102, 0.5);
 }
-.input{
+.input {
   border: 3px solid orange;
   border-radius: 1rem;
   overflow: hidden;
 }
 textarea {
-  width: 25vw
+  width: 25vw;
 }
 </style>

@@ -71,6 +71,22 @@ export default {
             
             if(newVal.inRace === true) this.$router.push('/play')
         }
+        
+        
+        
+    },
+    beforeRouteLeave (to, from, next) {
+      if (!to.params.id || to.params.id !== localStorage.getItem('room')) {
+        const payload = {
+          roomName: localStorage.getItem('room'),
+          playerName: localStorage.getItem('player')
+        }
+        this.$store.dispatch('deletePlayerFromRoom', payload)
+        localStorage.removeItem('room')
+        localStorage.removeItem('roomIndex')
+      }
+      // this.$router.push('/')
+      // console.log('ini to di before route leave rooms', to)
     }
 }
 </script>
