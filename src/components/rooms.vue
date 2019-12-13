@@ -25,9 +25,11 @@
         <hr style="width:10%;margin:10px">
             <b-button style="margin:5px;width:200px;border-radius:20px;" data-toggle="modal" data-target="#exampleModalCenter" variant="warning">Create Rooms</b-button>
             <h6> or join rooms</h6>
-        <div class="rooms" v-for="(room,index) in this.$store.state.rooms" :key="index">
-                <b-button @click.prevent="room && joinRoom(room.roomName,index)" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
-        </div>
+            <div class="list-room" style="overflow:scroll">
+                <div class="rooms" v-for="(room,index) in this.$store.state.rooms" :key="index">
+                        <b-button @click.prevent="room && joinRoom(room.roomName,index)" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
+                </div>
+            </div>
             <!-- Modal -->
             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -87,7 +89,6 @@ export default {
             }
             localStorage.setItem('room',roomName)
             localStorage.setItem('roomIndex',index)
-            // this.$router.push(`/waiting/${index}`)
             this.$store.dispatch('joinRoom',payload)
         },
         joinPlayer(){
@@ -108,7 +109,8 @@ export default {
                 'Lets wait for the challengers!',
                 'success'
             )
-            
+            this.$store.commit('FILL_RAND_LINTASAN')
+            payload.lintasan = this.$store.state.randLintasan.content
             localStorage.setItem('rooms',this.name)
             this.$store.dispatch('createRoom',payload)
         },
@@ -133,10 +135,10 @@ h1{
 }
 
 .rooms{
-    overflow:scroll;
+    /* overflow:scroll; */
 
     max-height:200px;width:500px;
-    overflow:scroll;
+    /* overflow:scroll; */
     display:flex;
     justify-content:center;
     flex-direction:column;

@@ -8,7 +8,7 @@
             <!-- {{getRoomDetail}} -->
            <center> Room Name : {{roomDetail.roomName}}</center>
           <center> Player Joined : {{getRoomDetail.players.toString()}} </center>  
-            <button v-if="getRoomDetail.numberOfPlayers <= getRoomDetail.players.length" style="position:absolute;top:53%;left:45%" type="button" @click="startGame" class="btn btn-primary btn-lg" data-dismiss="modal">Start Game</button>         
+            <button v-if="getRoomDetail.numberOfPlayers <= getRoomDetail.players.length" style="position:absolute;top:53%;left:45%" type="button" @click="startGame(roomDetail)" class="btn btn-primary btn-lg" data-dismiss="modal">Start Game</button>         
             </div>
       </div>
  
@@ -27,7 +27,10 @@ export default {
         }
     },
     methods: {
-        
+    startGame(roomDetail){
+        console.log('dari startgame waiting room',roomDetail)
+        this.$store.dispatch('startGame',roomDetail)
+    }
     },
     created(){
         if(localStorage.getItem('player')){
@@ -43,13 +46,7 @@ export default {
             // return this.$store.dispatch('getRoomDetail',localStorage.getItem('room'))
             this.roomDetail = this.$store.state.roomNow
             return this.$store.state.roomNow
-        },
-        getDetail(){
-            
-        }
-        
-        
-        
+        }, 
     }
 }
 </script>

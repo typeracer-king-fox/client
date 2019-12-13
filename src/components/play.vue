@@ -60,6 +60,7 @@ export default {
     }
   },
   computed: {
+   
     hurufs: function () {
       let array = []
       for (let i = 0; i < this.lintasan.length; i++) {
@@ -88,7 +89,8 @@ export default {
     ...mapState(['randLintasan'])
   },
   created () {
-      this.$store.commit('FILL_RAND_LINTASAN')
+    this.$store.commit('getData')
+    // console.log(this.$store.state.lintasan,'from get lintasan')
   }
 }
 </script>

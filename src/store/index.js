@@ -34,6 +34,8 @@ export default new Vuex.Store({
   },
   mutations: {
     GET_DATA (state, payload) {
+      console.log(payload.length,'jumlah dalam payload --------')
+      console.log(payload,'isi payload --------')
       state.lintasan = payload
     },
     FILL_ROOMS (state, payload) {
@@ -41,14 +43,20 @@ export default new Vuex.Store({
     },
 
     FILL_RAND_LINTASAN (state, payload) {
-      const index = Math.floor(Math.random() * state.lintasan.length)
-      state.randLintasan = state.lintasan[index]
+      // const index = Math.floor(Math.random() * state.lintasan.length)
+      console.log(state.lintasan,'------')
+      // state.randLintasan = state.lintasan[index]
     },
     DETAIL_ROOM(state,payload){
       state.roomNow = payload
     }
   },
   actions: {
+    startGame({ dispatch }, payload){
+      dispatch('getRooms')
+      dispatch('getRoomDetail')
+      console.log('dari actions',payload)
+    },
     createRoom({dispatch},payload){
       return db.collection('rooms').doc(payload.roomName).set(payload)
                 .then(success => {
@@ -62,11 +70,13 @@ export default new Vuex.Store({
     },
   
     getData ({ commit }) {
+      
       let lintasan = []
       db.collection('lintasan').onSnapshot(querySnapshot => {
         querySnapshot.forEach(lintasanData => {
           lintasan.push(lintasanData.data())
         })
+        // console.log(lintasan)
       })
       commit('GET_DATA', lintasan)
     },
@@ -118,16 +128,6 @@ export default new Vuex.Store({
         // console.log(querySnapshot.data(),'--------------------')
         commit('DETAIL_ROOM',querySnapshot.data())
       })
-        // .then(doc => {
-        //   if (!doc.exists) {
-        //   } else {
-        //     console.log('trigered ga yak?')
-        //     commit('DETAIL_ROOM',doc.data())
-        //   }
-        // })
-        // .catch(err => {
-        //   console.log('Error getting document', err);
-        // });
     },
 
   
@@ -151,20 +151,18 @@ export default new Vuex.Store({
           }else{
             
             if (!roomIsFull) {
-              console.log('masuk kedalam room belum penuh')
-              // console.log(this.state.rooms[index].players.length,Number(this.state.rooms[index].numberOfPlayers),'---------------')
               let playerNow = this.state.rooms[index].players
-
+              let progresses = this.state.rooms[index].progress
               if(playerNow.indexOf(payload.player) == -1) {
-                playerNow.push(payload.player);
+                playerNow.push(payload.player)
+                progresses.push(0)
               }
               router.push(`/waiting/${payload.roomName}`)
-
               const roomRef = db.collection('rooms').doc(payload.roomName)
               roomRef.update({
-                players: playerNow
+                players: playerNow,
+                progress: progresses
               })
-
               dispatch('getRooms')
               dispatch('getRoomDetail')
             }
