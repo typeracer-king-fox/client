@@ -1,22 +1,32 @@
 <template>
   <div class="board">
       <div v-if="welcomePage === true" class="opening">
-          <form style="padding:50px;">
-                <div class="form-group">
-                    <label for="exampleFormControlInput1">Player Name</label>
-                    <input v-model="name" type="text" class="form-control" id="exampleFormControlInput1" placeholder="player name">
+          <form style="padding:50px;" >
+                <div class="form-group" style="display:flex;justify-content:center;flex-direction:column;align-items:center;margin-top:50px;">
+                    <h3 style="margin-top:30px;">Welcome to</h3>
+                    <h1 style="margin-top:-10px;">KING of TYPING</h1>
+                    <hr>
+                    <p style="margin-top:-10px;">INSERT PLAYER NAME</p>
+                    <input v-model="playerName" type="text" class="form-control" id="exampleFormControlInput1" placeholder="player name" style="margin-bottom:20px;"> 
+                    
                     <button type="button" @click="joinPlayer" class="btn btn-primary" data-dismiss="modal">Play</button>
                 </div>
             </form>
       </div>
+
+      <!-- <div v-if="welcomePage === false && waitingRoom === true" class="opening" style="display:flex;justify-content:center;align-content:center;flex-direction:column">
+          <h3 style="margin-top:150px">waiting for another player....</h3>
+          <img src="https://i.pinimg.com/originals/26/bb/4f/26bb4f08d445790b80e7a1d90dfb65ab.gif" style="height:250px;">
+      </div> -->
+
       <div v-if="welcomePage === false" class="main-content" >
         <h3 style="margin-top:30px;">Welcome to</h3>
         <h1 style="margin-top:-10px;">KING of TYPING</h1>
         <hr style="width:10%;margin:10px">
             <b-button style="margin:5px;width:200px;border-radius:20px;" data-toggle="modal" data-target="#exampleModalCenter" variant="warning">Create Rooms</b-button>
             <h6> or join rooms</h6>
-        <div class="rooms">
-                <b-button v-for="(room,index) in this.$store.state.rooms" :key="index"  @click="joinRoom" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
+        <div class="rooms" v-for="(room,index) in this.$store.state.rooms" :key="index">
+                <b-button @click.prevent="room && joinRoom(room.roomName,index)" style="margin:5PX;width:200px;border-radius:20px;" variant="info">{{room.roomName}}</b-button>
         </div>
             <!-- Modal -->
             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -57,6 +67,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import Swal from 'sweetalert2'
 
 export default {
     data() {
@@ -64,37 +75,49 @@ export default {
             name:'',
             numberOfPlayer :'',
             playerName:'',
+            waitingRoom:true,
             welcomePage:true
         }
     },
     methods: {
-        joinRoom(roomName){
-            console.log('saiufgisaf');
-            
-            console.log(roomName)
+        joinRoom(roomName,index){
+            let payload = {
+                roomName : roomName,
+                player : localStorage.getItem('player')
+            }
+            localStorage.setItem('room',roomName)
+            localStorage.setItem('roomIndex',index)
+            // this.$router.push(`/waiting/${index}`)
+            this.$store.dispatch('joinRoom',payload)
         },
         joinPlayer(){
-            localStorage.setItem('player',this.name)
+            localStorage.setItem('player',this.playerName)
+            this.$router.push(`/`)
             this.welcomePage=false
         },
         createRoom(){
             let payload = {
                 roomName : this.name,
-                numberOfPlayer : this.numberOfPlayer,
-                players : [],
+                numberOfPlayers : this.numberOfPlayer,
+                players : [localStorage.getItem('player')],
+                progress : [0],
                 inRace : false
             }
+            Swal.fire(
+                'Room Created!',
+                'Lets wait for the challengers!',
+                'success'
+            )
+            
             localStorage.setItem('rooms',this.name)
             this.$store.dispatch('createRoom',payload)
-            this.$router.push('/play')
         },
-        joinRoom(){
-            console.log(this.playerName)
-        }
     },
     created(){
         if(localStorage.getItem('player')){
             this.welcomePage = false
+        }else{
+            this.welcomePage = true
         }
         this.$store.dispatch('getRooms')
     },

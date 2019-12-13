@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import firebase from 'firebase/app'
-import { componentsPlugin } from 'bootstrap-vue'
+// import { componentsPlugin } from 'bootstrap-vue'
+import router from '../router'
+import Swal from 'sweetalert2'
 
 Vue.use(Vuex)
 
@@ -25,7 +27,10 @@ export default new Vuex.Store({
   state: {
     lintasan: [],
     rooms: [],
-    randLintasan: ''
+    randLintasan: '',
+    isFull : false,
+    isWaiting : true,
+    roomNow : {}
   },
   mutations: {
     GET_DATA (state, payload) {
@@ -38,6 +43,9 @@ export default new Vuex.Store({
     FILL_RAND_LINTASAN (state, payload) {
       const index = Math.floor(Math.random() * state.lintasan.length)
       state.randLintasan = state.lintasan[index]
+    },
+    DETAIL_ROOM(state,payload){
+      state.roomNow = payload
     }
   },
   actions: {
@@ -45,6 +53,8 @@ export default new Vuex.Store({
       return db.collection('rooms').doc(payload.roomName).set(payload)
                 .then(success => {
                     dispatch('getRooms')
+                    console.log('created?? router jalan ga?')
+                    this.$router.push(`/waiting/${payload.roomName}`)
                 })
                 .catch(err => {
                   console.log(err)
@@ -89,44 +99,77 @@ export default new Vuex.Store({
         })
     },
     
-    getRooms({commit}){
+    getRooms({commit,state}){
+      // console.log(state.rooms,'---------------------------')
       let rooms = []
       db.collection('rooms').onSnapshot(querySnapshot => {
-        // console.log(querySnapshot)
         querySnapshot.forEach(room => {
           rooms.push(room.data())
-          })
+        })
       })
+      console.log('trigered?',rooms)
       commit('FILL_ROOMS', rooms)
     },
 
-    // the payload should send:
-    // 1. roomIndex to be joined
-    // 2. guest's name
+    getRoomDetail({commit},payload){
+      
+      // let rooms = []
+      db.collection('rooms').doc(payload).get()
+        .then(doc => {
+          if (!doc.exists) {
+          } else {
+            console.log('trigered ga yak?')
+            commit('DETAIL_ROOM',doc.data())
+          }
+        })
+        .catch(err => {
+          console.log('Error getting document', err);
+        });
+    },
+
+  
     joinRoom ({ dispatch }, payload) {
       let roomIsFull = false
       let roomIndex = -1
-
+      
       for (let index in this.state.rooms) {
-        if (this.state.rooms[index].id === payload.roomName) {
+        if (this.state.rooms[index].roomName == payload.roomName) {
+          console.log(this.state.rooms[index],payload.roomName)
           roomIndex = index
-
-          if (this.state.rooms[index].players.length === payload.numberOfPlayers) {
+          if (this.state.rooms[index].players.length >= Number(this.state.rooms[index].numberOfPlayers)) {
+            console.log('masuk kedalam room penuh')
             roomIsFull = true
-            break
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Room is full!',
+            })
+            
+          }else{
+            
+            if (!roomIsFull) {
+              console.log('masuk kedalam room belum penuh')
+              // console.log(this.state.rooms[index].players.length,Number(this.state.rooms[index].numberOfPlayers),'---------------')
+              let playerNow = this.state.rooms[index].players
+
+              if(playerNow.indexOf(payload.player) == -1) {
+                playerNow.push(payload.player);
+              }
+              router.push(`/waiting/${payload.roomName}`)
+
+              const roomRef = db.collection('rooms').doc(payload.roomName)
+              roomRef.update({
+                players: playerNow
+              })
+
+              dispatch('getRooms')
+              // dispatch('getRoomDetail')
+            }
           }
         }
       }
-
-      if (!roomIsFull) {
-        this.state.rooms[roomIndex].players.push(payload.playerName)
-        const roomRef = db.collection('rooms').doc(payload.roomName)
-        roomRef.update({
-          players: this.state.rooms[roomIndex].players
-        })
-
-        dispatch('getRooms')
-      }
+      
+      
     }
   },
   modules: {
