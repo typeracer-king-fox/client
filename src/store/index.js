@@ -117,8 +117,7 @@ export default new Vuex.Store({
       db.collection('rooms').onSnapshot(querySnapshot => {
         let rooms = []
         querySnapshot.forEach(room => {
-          console.log('ini masing2 room pas di getRooms', room.data())
-
+          // console.log('ini masing2 room pas di getRooms', room.data())
           if (room.data().players.length === 0) {
             const payload = {
               roomName: room.data().roomName
