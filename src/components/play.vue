@@ -27,7 +27,9 @@
       </div>
     </div>
     <div class="sentence bg-info">
-      <q>{{randLintasan.content}}</q>
+      <!-- <q>{{randLintasan.content}}</q> -->
+      <!-- <q>{{lintasan}}</q> -->
+      <q><span v-for="(huruf, index) in hurufs" :key="index" :id="`hurufke${index}`"><span v-if="huruf.salah" style="color: gold">{{huruf.content}}</span><span v-if="!huruf.salah">{{huruf.content}}</span></span></q>
     </div>
     <h3>Type the sentence above</h3>
     <div class="input">
@@ -35,6 +37,9 @@
         <textarea v-model="playerInput" class="form-control" rows="3"></textarea>
       </form>
     </div>
+    <b-modal id="modal-win" title="BootstrapVue" hide-footer hide-header>
+      <p class="my-4">YOU WIN!</p>
+    </b-modal>
   </div>
 </template>
 
@@ -45,15 +50,42 @@ export default {
   name: 'play',
   data: function () {
     return {
+      lintasan: 'An initial call using the callback you provide',
       playerInput: '',
-      progressP1: 50,
+      hurufEvaluated: null,
+      // progressP1: 50,
       progressP2: 75,
       progressP3: 90,
       progressP4: 25
     }
   },
   computed: {
-      ...mapState(['randLintasan'])
+    hurufs: function () {
+      let array = []
+      for (let i = 0; i < this.lintasan.length; i++) {
+        array.push({content: this.lintasan[i], salah: false})
+      }
+      return array
+    },
+    progressP1: function () {
+      let benar = 0
+      for (let i = 0; i < this.lintasan.length; i++) {
+        if(this.lintasan[i] === this.playerInput[i]) {
+          benar++
+        } else {
+          this.hurufEvaluated = i
+          this.hurufs[i].salah = true
+          break
+        }
+      }
+      if(benar/this.lintasan.length === 1) {
+        this.$bvModal.show('modal-win')
+        return benar/this.lintasan.length*100
+      } else {
+        return benar/this.lintasan.length*100
+      }
+    },
+    ...mapState(['randLintasan'])
   },
   created () {
       this.$store.commit('FILL_RAND_LINTASAN')
